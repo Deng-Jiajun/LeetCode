@@ -74,3 +74,275 @@
 和 69 题一样，二分法解决问题
 
 如果条件判断的时候发现 `middle==num/middle` 且 `num % middle == 0`，就返回 `true`，否则返回 `false` 其他情况下走出循环就返回 `false`
+
+## [27. 移除元素](https://leetcode-cn.com/problems/remove-element/)
+
+题目说明居然很贴心地说明是数组引用，这是我没想到的😶
+
+可以选择每一次发现一个目标元素就把后面的所有元素往前移进行覆盖，就是有点麻烦
+
+tags 给了提示，`two-pointers`，那用双指针
+
+维护两个指针，一个 `i` 用来遍历「原数组」，一个 `j` 用来遍历「返回的数组」
+
+遍历原数组，如果 `nums[i]!=val`，就 `nums[j++]=nums[i++]` 否则就直接 `i++`
+
+因为数组本来就需要遍历，所以 `i` 直接用作循环变量，不需要另外设指针
+
+代码实在太短，忍不住贴上来嗨一下
+
+```c
+int removeElement(int *nums, int numsSize, int val)
+{
+    int j = 0; // 新数组目前遍历到的位置，同时也是新数组的长度
+
+    // 遍历整个数组，如果不等于 val，就采用
+    for (int i = 0; i != numsSize; i++)
+    {
+        if (nums[i] != val)
+            nums[j++] = nums[i];
+    }
+    return j;
+}
+```
+
+### 相关题目
+
+#### [26. 删除有序数组中的重复项](https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/)
+
+和 27 题类似，双指针，只是这次要判断的不是目标元素，而是「重复」
+
+因为它是有序的，所以只需要判断「新数组」和「原数组」的当前位（指针指向的值）是不是相等，不相等的不采用即可
+
+要做一个长度判断，要求长度大于等于2，然后先把第一个元素纳入新数组，在这个基础上做循环判断
+
+> 26 和 27 都是双指针，难度也不大，但是在**边界选取**上存在差异，需要注意区分，试了 3 次才 AC
+
+```c
+int removeDuplicates(int *nums, int numsSize)
+{
+    // 长度为 0 和 1 就不判断了，循环的要求是 numsSize >= 2
+    if (numsSize < 2)
+        return numsSize;
+        
+    int j = 0; // 新数组目前遍历到的位置，同时也是「新数组的长度 - 1」
+
+    // 遍历整个数组，如果「旧数组」和「新数组」当前位不一样，就采用
+    for (int i = 1; i != numsSize; i++)
+    {
+        if (nums[i] != nums[j])
+            nums[++j] = nums[i];
+    }
+    return j + 1;
+}
+```
+
+
+
+#### [283. 移动零](https://leetcode-cn.com/problems/move-zeroes/)
+
+这题和 27 题比较类似，也是删除目标元素，只是再多做一步，在末尾后面补 0，判断条件比 26 题简单
+
+0 的数量 n = 原数组长度 - 新数组长度，从 nums[numsSize-1] 开始往前写 n 个 0 就行了
+
+```c
+void moveZeroes(int *nums, int numsSize)
+{
+    int j = 0; // 新数组目前遍历到的位置，同时也是新数组的长度
+
+    // 遍历整个数组，如果不等于 0，就采用
+    for (int i = 0; i != numsSize; i++)
+    {
+        if (nums[i] != 0)
+            nums[j++] = nums[i];
+    }
+
+    // 从 nums[numsSize-1] 开始往前写 0
+    for (int i = 0; i != numsSize - j; i++)
+    {
+        nums[numsSize - 1 - i] = 0;
+    }
+}
+```
+
+> AC 完了看到这个进阶提示：「**进阶：**你能尽量减少完成的操作次数吗？」
+>
+> 💡确实还能，可以选择**三指针**，直接在发现 0 的时候从数组末尾开始往前写 0
+>
+> ```c
+> void moveZeroes(int *nums, int numsSize)
+> {
+>     int j = 0;        // 新数组目前遍历到的位置，同时也是新数组的长度
+>     int k = numsSize; // 用来写 0 的指针
+> 
+>     // 遍历整个数组，如果不等于 0，就采用
+>     for (int i = 0; i != numsSize; i++)
+>     {
+>         if (nums[i] != 0)
+>             nums[j++] = nums[i];
+>         else
+>         {
+>             nums[--k] = 0;
+>         }
+>     }
+> }
+> ```
+>
+> 写完觉得自己真是个小天才😀，submit ! ，**Wrong Answer**。看着错误提示我才反应过来，我在没遍历完之前就把本来要遍历的数组尾部的数据给写 0 了
+>
+> 想了很久，确定没有办法实现，溜了
+>
+> 官方题解的双指针是一个指向 0，一个指向非 0，感觉有点复杂
+>
+> **如果不要求相对有序**的话，是可以选择把尾部的元素写到 0 的位置的，这种方案倒是可以实现类似上面说的那种思路
+
+#### [844. 比较含退格的字符串](https://leetcode-cn.com/problems/backspace-string-compare/)
+
+如果不考虑 `O(n)` 的时间复杂度和 `O(1)` 的空间复杂度，那就直接就写到两个新的数组里，碰到一个 `#` 就指针回退一位
+
+要求空间复杂度 `O(1)` 只能原地比较了，题目没有说不能修改原数组，那就直接上手改它就完事儿了（时间复杂度 `O(m+n)` = `O(n)`）
+
+```CSS
+/**
+ * @brief 文本处理
+ *
+ * 处理字符串中的退格字符 '#'，处理成全字符形式，末尾补上 '\0'
+ *
+ * @param s 要处理的字符串
+ */
+void TextProcess(char *s)
+{
+    int i = 0; // 遍历指针
+    int j = 0; // 有效字符指针
+    while (s[i])
+    {
+        // 如果不是 '#'，就采用该字符
+        if (s[i] != '#')
+        {
+            s[j++] = s[i];
+        }
+        // 如果是 '#'，而且 j 不为 0，就让有效指针回退
+        // 不知道会不会有一大堆的 '#'，还是判断一下 0 比较保险
+        else if (j != 0)
+        {
+            j--;
+        }
+        i++;
+    }
+    // 处理完了之后在末尾补 0
+    s[j] = '\0';
+}
+
+bool backspaceCompare(char *s, char *t)
+{
+    // 直接改动原数组，然后比较
+    TextProcess(s);
+    TextProcess(t);
+    return !strcmp(s, t);
+}
+```
+
+**其他思路 0**
+
+两个指针，从后往前遍历；两个变量，记录这次需要退格的次数
+
+如果当前字符不是 `#`，退格次数 -1
+
+如果是 `#`，则退格次数 +1
+
+直到退格次数为 0，且当前字符不是 `#` 时，退出循环，得到这次要比较的字符
+
+```c
+/**
+ * @brief 找到下一个用来比较的字符的下标
+ *
+ * @param s 要寻找的字符串
+ * @param index 开始的下标（从后往前）
+ * @return int 找到的下标（没找到就返回 -1，没找到的意思是前面是空的）
+ */
+int IndexOfNextChar(char *s, int index)
+{
+    int skipNum = 0; // 退格次数
+
+    while (index >= 0)
+    {
+        if (s[index] == '#') // 是退格符，记录
+        {
+            skipNum++;
+        }
+        else // 如果不是退格符，看一下要不要退格
+        {
+            if (skipNum == 0)
+            {
+                // 不需要退格，那找到了
+                return index;
+            }
+            else
+            {
+                // 需要退格，那就退格
+                skipNum--;
+            }
+        }
+
+        // 继续往前找
+        index--;
+    }
+    // 没找到就返回 -1
+    return -1;
+}
+
+bool backspaceCompare(char *s, char *t)
+{
+    // 从后往前遍历
+
+    // 用来比较的指针
+    int sIndex = strlen(s) - 1;
+    int tIndex = strlen(t) - 1;
+    while (true)
+    {
+        // 找下一个要比较的字符的下标
+        sIndex = IndexOfNextChar(s, sIndex);
+        tIndex = IndexOfNextChar(t, tIndex);
+
+        if (sIndex == -1 || tIndex == -1) // 如果其中有至少一个前面的部分是空的
+        {
+            // 如果都是空的，两个字符串相等，返回 ture
+            if (sIndex == -1 && tIndex == -1)
+                return true;
+            else // 否则二者不相等，返回 false
+                return false;
+        }
+        else // 都不为空，开始判断
+        {
+            // 这两个字符二者不相等，返回 false
+            if (s[sIndex] != t[tIndex])
+            {
+                return false;
+            }
+            else // 相等则继续找下一个字符
+            {
+                // 这一位没问题就往前再找一位
+                // 不用担心越界，IndexOfNextChar 发现越界会返回 -1
+                sIndex--;
+                tIndex--;
+            }
+        }
+    }
+}
+```
+
+因为是从后往前，所以没有回退的问题（时间复杂度 `O(m+n)` = `O(n)`）
+
+**其他思路1**
+
+直接用栈，碰到 `#` 就退栈，最后判断两个栈（不满足空间复杂度要求）
+
+
+
+#### [977. 有序数组的平方](https://leetcode-cn.com/problems/squares-of-a-sorted-array/)
+
+数组平方后虽然不再是非递减的，但是是「两边大，中间小」的，所以就可以双指针，指向首尾，向中间递进，取其中大的，写入新数组（从后往前写）
+
+写起来很顺，没啥坑
+
+> 本来应该一遍过的，结果编译出错了三次，因为 `left` 写成 `lfet` 了，vscode 楞是没有一个提示，就挺离谱的，啊？是我关的波浪线啊，那没事了😵

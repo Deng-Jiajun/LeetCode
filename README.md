@@ -512,11 +512,11 @@ struct ListNode *getIntersectionNode(struct ListNode *headA, struct ListNode *he
 
 所以难点就是数学😭总之就是不会
 
-还有一个有意思的办法：leetcode 在创建链表的时候分配的内存空间是连续的，也就是说，**前一个节点的地址会比后一个结点的地址小**，所以 `        if (p >= p->next) return p->next;` 
+还有一个有意思的办法：leetcode 在创建链表的时候分配的内存空间是连续的，也就是说，**前一个节点的地址会比后一个结点的地址小**，所以 `        if (p >= p->next) return p->next;` 
 
 # 哈希表
 
-# [242. 有效的字母异位词](https://leetcode.cn/problems/valid-anagram/)
+## [242. 有效的字母异位词](https://leetcode.cn/problems/valid-anagram/)
 
 这题判断两个字符串出现次数的方式在 [76. 最小覆盖子串](#76.-最小覆盖子串)中已经用过，而且 76 题还有大小写，这里只有小写，好处理很多，直接定一个大小 26 的数组算每个小写字母出现的字数即可。
 
@@ -532,8 +532,19 @@ struct ListNode *getIntersectionNode(struct ListNode *headA, struct ListNode *he
 
 直接用要 242 的函数 要 1800ms，优化一下也只能到 1500ms，看了一下整体逻辑，感觉优化空间不大了，哈希的本质是空间换时间，这种方式看起来空间没省多少，时间倒是慢的要死。不划算啊，还死磕了半天逻辑
 
-[438. 找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)
+#### [438. 找到字符串中所有字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/)
 
 把 49 改过的 242 的函数再改改，也还能用，这个嵌套层级浅一点，~~效果应该不错~~（当我没说，还是得 1300ms）
 
 做了太多类似的题，已经产生惯性了，实际这题应该用滑动窗口做，因为每滑动一次只会改变一个字母的数据，所以应该用 [76. 最小覆盖子串](#76.-最小覆盖子串)的处理方式看待窗口移动产生的变化，思路有了，心累了，不写了🐟
+
+## [349. 两个数组的交集](https://leetcode.cn/problems/intersection-of-two-arrays/)
+
+想法一：最土的办法肯定是直接两层 for 循环了，比较 `nums1[i]` 和 `nums2[j]`。官方给的第一种方法也是这种思想，但是用了哈希表去重，我这才发现，leetcode 自带了哈希表 `uthash`，利用它进行去重和查找，效率显然比直接套循环更快。
+
+想法二：和想法一类似，先把两个数组做去重和排序，取两个数组各自最小值的更大者作为比较空间的下限，各自最大值的更小者为比较空间的上限，在这个范围内套for循环。逻辑上可行，但是效率上我不知道结果。（当然，直接排序然后用双指针也是可以的）
+
+### 相关题目 [350. 两个数组的交集 II](https://leetcode.cn/problems/intersection-of-two-arrays-ii/)
+
+这题的题目都和 349 很像，整体处理思路没大什么区别，也可以 for 循环嵌套解决，但是因为结果交集存在重复元素，具体细节的处理还是有很多不同的。
+

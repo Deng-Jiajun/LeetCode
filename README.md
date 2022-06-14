@@ -788,3 +788,48 @@ int **fourSum(int *nums, int numsSize, int target, int *returnSize, int **return
 ```
 
 很快就写完调试完 AC 了，但是感觉有点背题的味道了，加上大部分还是 copilot 提示出来的，非常没有实感，很空。
+
+# 字符串
+
+## [344. 反转字符串](https://leetcode.cn/problems/reverse-string/)
+
+0 ↔ size - 1、1 ↔ size - 2、2 ↔ size - 3 …… 没啥好说的
+
+## [541. 反转字符串 II](https://leetcode.cn/problems/reverse-string-ii/)
+
+模拟，具体反转可以直接用 344 的函数
+
+## [剑指 Offer 05. 替换空格](https://leetcode.cn/problems/ti-huan-kong-ge-lcof/)
+
+第一个想法：新建一个空数组，逐位读入，碰到空格就写入 `%20`
+
+[题解](https://programmercarl.com/%E5%89%91%E6%8C%87Offer05.%E6%9B%BF%E6%8D%A2%E7%A9%BA%E6%A0%BC.htm)的方法：原地修改，先统计空格的数量，然后扩充数组到需要的长度，然后双指针从后往前逐个移动，并填入 `%20`。看着蛮好，仔细想想不对，C 语言不能这么做，这是访问越界。  
+所以对 C 语言来说，统计空格的数量的目的在于避免申请空间过大：`char *ret = (char *)malloc(sizeof(char) * strlen(s) * 3 + 1);` 如果对空间要求敏感，则有必要先遍历一遍空格数量再确定申请的空间大小，当然这显然会在一定程度上影响运行速度（一次遍历而已，影响应该不大？）
+
+## [151. 颠倒字符串中的单词](https://leetcode.cn/problems/reverse-words-in-a-string/)
+
+第一个想法：双指针，从后往前，left 和 right 包裹一个单词，写到另外一个数组。
+
+C 语言修改字符串并不容易，所以没有很好的原地解法
+
+[题解](https://programmercarl.com/0151.%E7%BF%BB%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2%E9%87%8C%E7%9A%84%E5%8D%95%E8%AF%8D.html)的方法很巧妙：
+
+"the sky is blue "
+
+- 先处理字符串，去除头尾的空格，每个中间的空格保留一个："the sky is blue"
+- 再把整个字符串反转："eulb si yks eht"
+- 再把每个单词都反转一次："blue is sky the"
+
+但是这个办法显然不适合 C，因为对字符数组做 trim 的工作用 C 语言手动实现还是比较复杂的。
+
+根据上面的逻辑，我想到一个新办法：把处理空格的步骤和字符处理的步骤结合起来，**遍历处理空格的同时把单词反转**：
+
+"the sky is blue "
+
+- 去除多余空格并反转每个单词："eht yks si eulb"
+- 反转整个字符串："blue is sky the"
+
+当然没有解决的问题还是：这不是一个 `O(1)` 空间复杂度的算法，从效率上看，`O(1)` 挺麻烦的，不划算
+
+> 又折腾了几个小时的数组越界问题，憋了半天才解决。这种问题真的太难受了
+

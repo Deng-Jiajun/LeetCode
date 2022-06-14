@@ -382,8 +382,7 @@ bool backspaceCompare(char *s, char *t)
 ```c
 /* 计算 t 中每个字符的数量 */
 int value[128] = {0}; // 对应 ASCII 码表，A=65 z=122
-for (int i = 0; t[i] != '\0'; i++)
-{
+for (int i = 0; t[i] != '\0'; i++){
     value[t[i]]++;
 }
 ```
@@ -526,6 +525,8 @@ struct ListNode *getIntersectionNode(struct ListNode *headA, struct ListNode *he
 
 和 242 思路一样，白捡一题
 
+就是最简单的哈希，key 就是 index，哈希函数就是 `ransomNote[i] - 'a'`，value 就是对应字母出现次数
+
 #### [49. 字母异位词分组](https://leetcode.cn/problems/group-anagrams/)
 
 直接利用 242 的函数，套两层循环判断两个字符串是否是「字母异位词」，是就放在一组里。
@@ -564,3 +565,226 @@ struct ListNode *getIntersectionNode(struct ListNode *headA, struct ListNode *he
 从结果来看，用上 uthash，内存占用从排名上暴降，属实是空间换时间了，由于规模不大，和法二的运行时间一样，都只有 4ms
 
 **leetcode 官方给出的双指针法**：思路很简单，用 qsort 从小到大排序，如果二者不相等，更小的那个数向前移，如果二者相等，就输出再一起前移
+
+## [202. 快乐数](https://leetcode.cn/problems/happy-number/)
+
+它居然是简单题，属实**快乐不起来**
+
+首先看到 `1 <= n <= 2³¹ - 1` 第一反应是：会不会溢出？实际上是不会的，因为最大也就是十几个 `9²` 相加而已
+
+然后第二点：这不是**模拟**吗？我算不就完事了？仔细想想又不对，如果无限循环，并**不知道怎么退出循环**
+
+然后第三点：这和哈希表是什么关系？没想通。先偷偷看了一眼评论，发现题目其实有高亮提示，如果不能退出，会出现**无限循环**。  
+无限循环嘛，那就说明会有重复值，所以只要把每次运算的结果都写到哈希表里就行了，如果表里可以找到，那就可以退出循环了
+
+> 从某种数学玄学上看，如果 20 次都没有跳出循环，这个数肯定不快乐。当然题目不能这么做就是了
+
+看了题解，除了用哈希，还可以用快慢指针，如果发现了环，它就不快乐，环的发现具体思路见 [142. 环形链表 II](#142.-环形链表-II)，总的来说就是龟兔赛跑，快的多跑几圈总会追上慢的
+
+## [1. 两数之和](https://leetcode.cn/problems/two-sum/)
+
+第一题，都做过，暴力解法当然是两层 for 循环
+
+另外的方式就是哈希表法，先让数组的第一个元素加入哈希表，然后从第二个元素开始找，哈希表里有没有和这个元素之和为 target 的  
+有就返回这两个数的下标  
+没有就把这个数也加入哈希表（key 为值，value 为在数组中的下标）
+
+## [454. 四数相加 II](https://leetcode.cn/problems/4sum-ii/)
+
+暴力破解，四层循环，直接算，**超时**
+
+```c
+int fourSumCount(int *nums1, int nums1Size, int *nums2, int nums2Size, int *nums3, int nums3Size, int *nums4, int nums4Size){
+    int count = 0;
+    /* 4 层循环 */
+    for (int index1 = 0; index1 != nums1Size; index1++)
+        for (int index2 = 0; index2 != nums2Size; index2++)
+            for (int index3 = 0; index3 != nums3Size; index3++)
+                for (int index4 = 0; index4 != nums4Size; index4++)
+                    if (nums1[index1] + nums2[index2] + nums3[index3] + nums4[index4] == 0)
+                        count++;
+    return count;
+}
+```
+
+看了题解，具体方式其实也很简单：**把规模打下去**，暴力破解的时间复杂度是 `i*j*k*l`。  
+拆解规模的方式是把 4 个数组对半分成两组（nums1 + nums2 和 nums3 + nums4）），分别计算两个数组各自两个数之和及出现次数，然后再看 `sum1[i]` 和 `sum2[i]` 之和为 0 的总共有多少组，就是最终答案，整体时间复杂度为 `i*j + k*l`（考虑到其他的操作，复杂度带常数倍系数，总之大致是这个规模）
+
+💡注意：如果第一组中有 3 个和为 2 的组合，第二组中有 4 个和为 -2 的组合，则这一对所得的元组数量为 3*4=12 种
+
+## [15. 三数之和](https://leetcode.cn/problems/3sum/)
+
+for 循环嵌套可以得到从位置上而言不重复的三元组，但是数值上三元组是可能重复的：
+
+```
+Input
+[-1,0,1,2,-1,-4]
+
+Output
+[[-1,0,1],[-1,2,-1],[0,1,-1]]
+
+Expected Answer
+[[-1,-1,2],[-1,0,1]]
+```
+
+那么如何去重，就是一个不太好处理的问题。想到的解决方式是先排序，然后再去重，尝试了之后发现超时了，显然面对较长的数组时，三层 for 循环的耗时太大了。
+
+[题解](https://programmercarl.com/0015.%E4%B8%89%E6%95%B0%E4%B9%8B%E5%92%8C.html)给出的方法是先排序，然后用双指针寻找结果，这种方法我不太满意，如果是这样的话，先排序然后for循环嵌套，最后简单去重一下也是可以的，但是看了一下，好像也没有什么其他的办法，就这样吧
+
+```c
+int cmp(const void *a, const void *b){
+    return *(int *)a - *(int *)b;
+}
+
+/**
+ * Return an array of arrays of size *returnSize.
+ * The sizes of the arrays are returned as *returnColumnSizes array.
+ * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
+ */
+int **threeSum(int *nums, int numsSize, int *returnSize, int **returnColumnSizes){
+    if (numsSize < 3){
+        *returnSize = 0;
+        *returnColumnSizes = NULL;
+        return NULL;
+    }
+
+    /* 排序 */
+    qsort(nums, numsSize, sizeof(int), cmp);
+
+    /* 双指针找结果集 */
+    int **result = (int **)malloc(sizeof(int *) * numsSize * numsSize);
+    *returnSize = 0;
+
+    int left;
+    int right;
+    int sum;
+
+    /* 在[i + 1, numsSize - 1]找 nums[i] 对应的另外两个数 */
+    for (int i = 0; i < numsSize - 2; i++){
+        /* 由于数组的有序性，如果 nums[i] 已经大于 0，则后面的数字必然大于 0，不需要再找 */
+        if (nums[i] > 0)
+            break;
+
+        left = i + 1;
+        right = numsSize - 1;
+        while (left < right){
+            sum = nums[i] + nums[left] + nums[right];
+            if (sum < 0)
+                left++;
+            else if (sum > 0)
+                right--;
+            else // ==0
+            {
+                result[*returnSize] = (int *)malloc(sizeof(int) * 3);
+                result[*returnSize][0] = nums[i];
+                result[*returnSize][1] = nums[left];
+                result[*returnSize][2] = nums[right];
+                (*returnSize)++;
+                // break;
+                /* 👆不能 break，还有其他的可能，但是需要缩范围 */
+                while (left < right && nums[left] == nums[left + 1])
+                    left++;
+                while (left < right && nums[right] == nums[right - 1])
+                    right--;
+
+                /* 缩范围 */
+                left++;
+                right--;
+            }
+        }
+
+        /* i 前推，避免重复 */
+        while (i < numsSize - 3 && nums[i] == nums[i + 1])
+            i++;
+    }
+
+    *returnColumnSizes = (int *)malloc(sizeof(int) * *returnSize);
+    for (int i = 0; i < *returnSize; i++)
+        (*returnColumnSizes)[i] = 3;
+
+    return result;
+}
+```
+
+最后搞了半天终于 AC 了，感觉还有还是迷迷糊糊的。
+
+> 关于结果集的大小：`int **result = (int **)malloc(sizeof(int *) * numsSize * numsSize);` 这里的规模是数组的平方，最开始用的**立方**，发现对于太大的就数组会提示申请内存过多，所以改为了**平方**。
+>
+> 我也不知道极限情况下的规模是多大😵
+
+## [18. 四数之和](https://leetcode.cn/problems/4sum/)
+
+在[15. 三数之和](#15.-三数之和)的基础上再套一层 for 循环，枚举两个数，然后再用双指针找另外两个数。需要注意的是，这次要求的不是和为 0，而是 target，所以三数之和中做的一些剪枝的操作这里不能再用了。
+
+```c
+int comp(const void *a, const void *b){
+    return *(int *)a - *(int *)b;
+}
+
+/**
+ * Return an array of arrays of size *returnSize.
+ * The sizes of the arrays are returned as *returnColumnSizes array.
+ * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
+ */
+int **fourSum(int *nums, int numsSize, int target, int *returnSize, int **returnColumnSizes){
+    if (numsSize < 4){
+        *returnSize = 0;
+        return NULL;
+    }
+
+    int **result = (int **)malloc(sizeof(int *) * numsSize * numsSize);
+    *returnSize = 0;
+
+    /* 先排序 */
+    qsort(nums, numsSize, sizeof(int), comp);
+
+    /* 两层for循环确定两个数 */
+    for (int i = 0; i < numsSize - 3; i++){
+        for (int j = i + 1; j < numsSize - 2; j++){
+            int sum_find = target - (nums[i] + nums[j]);
+            /* 双指针找剩下的两个数，其和为 sum_find */
+            int left = j + 1, right = numsSize - 1;
+            while (left < right){
+                int sum = nums[left] + nums[right];
+                if (sum == sum_find){
+                    result[*returnSize] = (int *)malloc(sizeof(int) * 4);
+                    result[*returnSize][0] = nums[i];
+                    result[*returnSize][1] = nums[j];
+                    result[*returnSize][2] = nums[left];
+                    result[*returnSize][3] = nums[right];
+                    (*returnSize)++;
+
+                    /* 缩范围 */
+                    while (left < right && nums[left] == nums[left + 1])
+                        left++;
+                    while (left < right && nums[right] == nums[right - 1])
+                        right--;
+
+                    /* 定范围 */
+                    left++, right--;
+                }
+                else if (sum < sum_find)
+                    left++;
+                else // sum > sum_find
+                    right--;
+            }
+
+            /* 前推，避免重复 */
+            while (j < numsSize - 2 && nums[j] == nums[j + 1])
+                j++;
+        }
+
+        /* 前推，避免重复 */
+        while (i < numsSize - 3 && nums[i] == nums[i + 1])
+            i++;
+    }
+
+    *returnColumnSizes = (int *)malloc(sizeof(int) * *returnSize);
+    for (int i = 0; i < *returnSize; i++)
+        (*returnColumnSizes)[i] = 4;
+
+    return result;
+}
+```
+
+很快就写完调试完 AC 了，但是感觉有点背题的味道了，加上大部分还是 copilot 提示出来的，非常没有实感，很空。

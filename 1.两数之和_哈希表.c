@@ -139,7 +139,7 @@ int *twoSum(int *nums, int numsSize, int target, int *returnSize)
 
     /* 然后从第二个元素开始找，哈希表里有没有和这个元素之和为 target 的，
         - 有就返回这两个数的下标
-        - 没有就把这个数也加入哈希表（key 为值，value 为在数组中的下标
+        - 没有就把这个数也加入哈希表（key 为值，value 为在数组中的下标）
     */
     for (int i = 1; i < numsSize; i++)
     {

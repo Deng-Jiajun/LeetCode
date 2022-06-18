@@ -1,3 +1,6 @@
+// [剑指 Offer 05. 替换空格]
+// (https://leetcode.cn/problems/ti-huan-kong-ge-lcof/)
+
 char *replaceSpace(char *s)
 {
     char *ret = (char *)malloc(sizeof(char) * strlen(s) * 3 + 1);

@@ -468,7 +468,7 @@ typedef struct MyLinkedList_t{
 >
 > 使用虚拟头结点可以显著减少边界情况的处理，为了少死点脑细胞，能用则用
 
-[面试题 02.07. 链表相交](https://leetcode.cn/problems/intersection-of-two-linked-lists-lcci/)
+## [面试题 02.07. 链表相交](https://leetcode.cn/problems/intersection-of-two-linked-lists-lcci/)
 
 **思路 1**：
 
@@ -833,3 +833,44 @@ C 语言修改字符串并不容易，所以没有很好的原地解法
 
 > 又折腾了几个小时的数组越界问题，憋了半天才解决。这种问题真的太难受了
 
+## [剑指 Offer 58 - II. 左旋转字符串](https://leetcode.cn/problems/zuo-xuan-zhuan-zi-fu-chuan-lcof/)
+
+想法一：统一左移 1 位，左移 `k % length` 次，需要一个额外空间（用于暂存），时间复杂度较高
+
+想法二：统一直接左移 `k % length`  位，需要额外 `lenth - (k % length)` 个额外空间，时间复杂度较低  
+写到这里反应过来了，实际上是把字符串分成两段：`[0, k % length]`，`[k % length + 1, length - 1]`，然后交换两段的位置即可。
+
+以 s = "abcdefg", k = 2 为例：ab | cdefg → `[0, k]`, `[k + 1, length - 1]`
+
+显然要提高难度，肯定是放在**原地算法**上，[题解](https://programmercarl.com/%E5%89%91%E6%8C%87Offer58-II.%E5%B7%A6%E6%97%8B%E8%BD%AC%E5%AD%97%E7%AC%A6%E4%B8%B2.html)给出的方案是：反转第一部分、反转第二部分，整体反转。需要一个额外空间用于交换暂存。
+
+粗略比较一下：
+
+- 原地反转：时间复杂度：2N，空间复杂度：1
+- 子串拼接：时间复杂度：N，空间复杂度：N
+- 模拟左移：时间复杂度：K*N，空间复杂度：1
+
+## [28. 实现 strStr()](https://leetcode.cn/problems/implement-strstr/)
+
+for 循环嵌套吧，如果第一元素一样，就一个个都试过去。
+
+KMP？看了一半给我整崩溃了，一个 next 数组都折腾半天。
+
+Sunday 算法看起来明显直观很多，总结起来逻辑很直观：  
+如果本轮匹配失败，就看窗口外的下一个字符在不在模式串里  
+如果不在，直接到下下个字符的位置去匹配；  
+如果在，就把模式串里最后一次出现这个字符的位置和下一个字符的位置对齐
+
+看了 Sunday 算法我整个人眼泪流下来，这才是我这种弱智看得懂的算法。
+
+## [459. 重复的子字符串](https://leetcode.cn/problems/repeated-substring-pattern/)
+
+得，报应来了。KMP
+
+不管 KMP 了，数学解法思路如下：
+
+对于字符串 str，如果它可以有由字符串重复构成，  
+那么，把两个 str 拼接，即 str + str，然后把这个 str + str 头尾各砍掉一个字符串，必然还能在中间找到一个 str  
+（因为有重复的子串，那么子串数量起码是两个：s's'，那么两个 str 就是 s's's's'，破坏掉头尾的 s' 也还是 s-s's's-，中间还有两个子串：s's'
+
+例子："abab" => "abab"+"abab" => "bab"+"aba" （可以找到 "abab"）

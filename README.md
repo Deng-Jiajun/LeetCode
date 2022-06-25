@@ -874,3 +874,9 @@ Sunday 算法看起来明显直观很多，总结起来逻辑很直观：
 （因为有重复的子串，那么子串数量起码是两个：s's'，那么两个 str 就是 s's's's'，破坏掉头尾的 s' 也还是 s-s's's-，中间还有两个子串：s's'
 
 例子："abab" => "abab"+"abab" => "bab"+"aba" （可以找到 "abab"）
+
+# 栈与队列
+
+## [232. 用栈实现队列](https://leetcode.cn/problems/implement-queue-using-stacks/)
+
+拖了好几天才写完，稀里糊涂的就 AC 了，先这样吧
